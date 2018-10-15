@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+            android:id="@+id/main_menu_action_to_join"
+            android:icon="@drawable/ic_launcher_foreground"
+            android:checkable="true"
+            app:showAsAction="ifRoom"
+            android:title="to Join">
+    </item>
+    <item
+            android:id="@+id/main_menu_action_members"
+            app:showAsAction="never"
+            android:checkable="true"
+            android:title="Member">
+    </item>
+    <item
+            android:id="@+id/main_menu_action_organizer"
+            app:showAsAction="never"
+            android:checkable="true"
+            android:title="Organizer">
+    </item>
+    <item
+            android:id="@+id/main_menu_action_requests"
+            app:showAsAction="never"
+            android:title="Requests">
+    </item>
+    <item
+            android:id="@+id/main_menu_action_quit"
+            app:showAsAction="never"
+            android:title="Quit">
+    </item>
+</menu>

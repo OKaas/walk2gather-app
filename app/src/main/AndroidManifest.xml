@@ -17,6 +17,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".HomeView">
+                  <!--android:parentActivityName=".LoginActivity">-->
+            <!--&lt;!&ndash; For Lower Android SDK API &ndash;&gt;-->
+            <!--<meta-data-->
+                <!--android:name="android.support.PARENT_ACTIVITY"-->
+                <!--android:value=".LoginActivity" />-->
         </activity>
     </application>
 
