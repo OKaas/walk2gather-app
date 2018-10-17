@@ -6,13 +6,26 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.widget.ListView
+import com.walk2gather.model.GroupItem
+import com.walk2gather.adapter.CustomAdapter
+import android.support.v4.view.accessibility.AccessibilityEventCompat.setAction
+import android.view.View
+import android.widget.AdapterView
 
-class HomeView : AppCompatActivity() {
+
+
+
+class HomeActivity : AppCompatActivity() {
 
     // Const
     // ===========================================================================================
     private val TAG = this::class.java.simpleName
 
+
+    private lateinit var listView : ListView
+
+    private lateinit var adapter: CustomAdapter
 
     // Initializer
     //
@@ -27,6 +40,33 @@ class HomeView : AppCompatActivity() {
         val loginPassword = intent.getStringExtra(LoginActivity.LOGIN_PASSWORD)
 
         Log.i(TAG, "$loginName > $loginPassword" )
+
+
+        // Fill ListView data -> get data, create adapter for them
+
+        var model = arrayListOf<GroupItem>()
+        for (i in 1..20){
+            model.add(GroupItem("Test $i", i))
+        }
+
+        adapter = CustomAdapter(model, applicationContext)
+
+        listView = findViewById(R.id.homeView_listView)
+        listView.adapter = adapter
+
+        listView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+            val dataModel = model.get(position)
+
+            Log.i(TAG, dataModel.toString())
+
+//            Snackbar.make(
+//                view,
+//                dataModel.getName() + "\n" + dataModel.getType() + " API: " + dataModel.getVersion_number(),
+//                Snackbar.LENGTH_LONG
+//            )
+//                .setAction("No action", null).show()
+        }
+
     }
 
     // Toolbar

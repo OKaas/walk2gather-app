@@ -26,7 +26,7 @@ class LoginActivity : AppCompatActivity() {
 
         val loginName = findViewById<EditText>(R.id.login_textView_name).text.toString()
         val loginPassowrd = findViewById<EditText>(R.id.login_textView_password).text.toString()
-        val intent = Intent(this, HomeView::class.java).apply {
+        val intent = Intent(this, HomeActivity::class.java).apply {
             putExtra(LOGIN_NAME, loginName)
             putExtra(LOGIN_PASSWORD, loginPassowrd)
         }
