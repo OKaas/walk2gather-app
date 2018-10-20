@@ -1,7 +1,6 @@
 package com.walk2gather.adapter
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,8 +8,11 @@ import android.view.animation.AnimationUtils
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import com.google.firebase.database.FirebaseDatabase
 import com.walk2gather.R
-import com.walk2gather.model.GroupItem
+import com.walk2gather.R.id.*
+import com.walk2gather.R.layout.group_item_view
+import com.walk2gather.model.ui.GroupItem
 
 
 class CustomAdapter(private val dataSet: ArrayList<GroupItem>, private var mContext: Context) :
@@ -29,17 +31,6 @@ class CustomAdapter(private val dataSet: ArrayList<GroupItem>, private var mCont
 
     override fun onClick(v: View) {
 
-//        val position = v.tag as Int
-//        val `object` = getItem(position)
-//        val dataModel = `object` as GroupItem
-
-//        when (v.getId()) {
-
-//            R.id.groupItemView_imageView_info -> Log.i(TAG, "Name: "+(dataModel!!.name) + " | Occupancy: "+dataModel!!.occupancy)
-
-//            R.id.item_info -> Snackbar.make(v, "Release date " + dataModel!!.getFeature(), Snackbar.LENGTH_LONG)
-//                .setAction("No action", null).show()
-//        }
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
@@ -55,10 +46,11 @@ class CustomAdapter(private val dataSet: ArrayList<GroupItem>, private var mCont
 
             viewHolder = ViewHolder()
             val inflater = LayoutInflater.from(context)
-            convertView = inflater.inflate(R.layout.group_item_view, parent, false)
-            viewHolder.txtName = convertView!!.findViewById(R.id.groupItemView_textView_name)
-            viewHolder.txtOccupancy = convertView!!.findViewById(R.id.groupItemView_textView_occupancy)
-            viewHolder.info = convertView!!.findViewById(R.id.groupItemView_imageView_info)
+
+            convertView = inflater.inflate(group_item_view, parent, false)
+            viewHolder.txtName = convertView!!.findViewById(groupItemView_textView_name)
+            viewHolder.txtOccupancy = convertView!!.findViewById(groupItemView_textView_occupancy)
+            viewHolder.info = convertView!!.findViewById(groupItemView_imageView_info)
 
             result = convertView
 
@@ -76,6 +68,7 @@ class CustomAdapter(private val dataSet: ArrayList<GroupItem>, private var mCont
         lastPosition = position
 
         viewHolder.txtName!!.text = dataModel!!.name
+        viewHolder.txtOccupancy!!.text = dataModel!!.occupancy.toString()
 //        viewHolder.txtType!!.setText(dataModel!!.getType())
 //        viewHolder.txtVersion!!.setText(dataModel!!.getVersion_number())
         viewHolder.info!!.setOnClickListener(this)

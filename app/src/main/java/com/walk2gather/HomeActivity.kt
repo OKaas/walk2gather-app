@@ -1,5 +1,6 @@
 package com.walk2gather
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -8,8 +9,14 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.AdapterView
 import android.widget.ListView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
+import com.walk2gather.R.id.*
+import com.walk2gather.R.menu.main_menu
 import com.walk2gather.adapter.CustomAdapter
-import com.walk2gather.model.GroupItem
+import com.walk2gather.model.db.Group
+import com.walk2gather.model.ui.GroupItem
+import kotlinx.android.synthetic.main.activity_home_view.*
 
 
 class HomeActivity : AppCompatActivity() {
@@ -18,11 +25,16 @@ class HomeActivity : AppCompatActivity() {
     // ===========================================================================================
     private val TAG = this::class.java.simpleName
 
+    // Data
+    // ===========================================================================================
+    private lateinit var database:      DatabaseReference
+    private lateinit var auth:          FirebaseAuth
 
-    private lateinit var listView : ListView
+    private lateinit var modelGroup:    ArrayList<GroupItem>
 
-    private lateinit var adapter: CustomAdapter
-
+    // GUI
+    // ===========================================================================================
+    private lateinit var adapter:       CustomAdapter
 
 
     // Initializer
@@ -32,47 +44,55 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_view)
 
+        Log.i(TAG, "onCreate")
 
-        // Get the Intent that started this activity and extract the string
+        // First -> from login Activity
         val loginName = intent.getStringExtra(LoginActivity.LOGIN_NAME)
         val loginPassword = intent.getStringExtra(LoginActivity.LOGIN_PASSWORD)
 
-        Log.i(TAG, "$loginName > $loginPassword" )
+        modelGroup = arrayListOf()
+        adapter = CustomAdapter(modelGroup, applicationContext)
 
-
-        // Fill ListView data -> get data, create adapter for them
-
-        var model = arrayListOf<GroupItem>()
-        for (i in 1..20){
-            model.add(GroupItem("Test $i", i))
-        }
-
-        adapter = CustomAdapter(model, applicationContext)
-
-        listView = findViewById(R.id.homeView_listView)
-        listView.adapter = adapter
-
-        listView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
-            val dataModel = model.get(position)
+        homeView_listView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+            val dataModel = modelGroup.get(position)
 
             Log.i(TAG, dataModel.toString())
-
-//            Snackbar.make(
-//                view,
-//                dataModel.getName() + "\n" + dataModel.getType() + " API: " + dataModel.getVersion_number(),
-//                Snackbar.LENGTH_LONG
-//            )
-//                .setAction("No action", null).show()
         }
 
+        // Prepare database connection
+        Log.i(TAG, "$loginName > $loginPassword" )
+        database = FirebaseDatabase.getInstance().reference
+        auth = FirebaseAuth.getInstance()
     }
 
-    // Toolbar
+    override fun onStart() {
+        super.onStart()
+        Log.i(TAG, "onStart")
+
+
+        database.child(Group.PATH).addListenerForSingleValueEvent( object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val groups = snapshot.children
+
+                // fill Item holder
+                groups.forEach {
+                    val group = it.getValue(Group::class.java) as Group
+                    modelGroup.add( GroupItem(group.name, group.ocucpancy) )
+                }
+
+                fillGroupList()
+            }
+        })
+    }
+
+    // UI
     //
     // ===========================================================================================
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater: MenuInflater = menuInflater
-        inflater.inflate(R.menu.main_menu, menu)
+        menuInflater.inflate(main_menu, menu)
         return true
     }
 
@@ -82,16 +102,37 @@ class HomeActivity : AppCompatActivity() {
 
         // Handle item selection
         return when (item.itemId) {
-            R.id.main_menu_action_to_join -> {
+            main_menu_action_to_join -> {
                 Log.i(TAG, "Clicked Add")
                 item.isChecked = false
                 true
             }
-            R.id.main_menu_action_members -> {
+            main_menu_action_members -> {
                 Log.i(TAG, "Clicked setting")
+                true
+            }
+            main_menu_action_create_group -> {
+                Log.i(TAG, "Clicked create group")
+                intentCreateGroup()
+                true
+            }
+            main_menu_action_quit -> {
+                finish()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+    // Contributors
+    // ===========================================================================================
+    private fun fillGroupList(){
+        homeView_listView.adapter = adapter
+    }
+
+
+    private fun intentCreateGroup(){
+        startActivity(Intent(this@HomeActivity, CreateGroupActivity::class.java))
+    }
+
 }

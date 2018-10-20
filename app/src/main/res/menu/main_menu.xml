@@ -8,13 +8,18 @@
             android:title="to Join">
     </item>
     <item
+            android:id="@+id/main_menu_action_create_group"
+            app:showAsAction="never"
+            android:title="Create group">
+    </item>
+    <item
             android:id="@+id/main_menu_action_members"
             app:showAsAction="never"
             android:checkable="true"
             android:title="Member">
     </item>
     <item
-            android:id="@+id/main_menu_action_organizer"
+            android:id="@+id/main_menu_action_moderator"
             app:showAsAction="never"
             android:checkable="true"
             android:title="Organizer">

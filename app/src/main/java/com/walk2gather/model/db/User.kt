@@ -1,4 +1,4 @@
-package com.walk2gather.model
+package com.walk2gather.model.db
 
 import com.google.firebase.database.IgnoreExtraProperties
 import com.google.firebase.database.PropertyName
@@ -10,4 +10,10 @@ data class User(@get:PropertyName("username")
 
                 @get:PropertyName("password")
                 @set:PropertyName("password")
-                var password: String? = "")
+                var password: String? = ""
+){
+    companion object Path {
+        val PATH = User::class.java.simpleName.toLowerCase()
+    }
+}
+

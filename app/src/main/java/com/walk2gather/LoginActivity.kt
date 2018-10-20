@@ -6,34 +6,48 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.walk2gather.model.User
+import com.walk2gather.model.db.User
 import kotlinx.android.synthetic.main.activity_login_view.*
 import android.app.ProgressDialog
 import android.support.annotation.VisibleForTesting
 import android.widget.Toast
 import com.google.firebase.database.*
+import com.walk2gather.model.db.Group
 import java.util.*
 
 class LoginActivity : AppCompatActivity() {
 
+
+    // Constants
+    // ===========================================================================================
     private val TAG = this::class.java.simpleName
-
-    private val DB_USERS = "users"
     private val DB_USERS_USERNAME = "username"
-
     companion object {
         const val LOGIN_NAME = "loginActivity_name"
         const val LOGIN_PASSWORD = "loginActivity_password"
     }
 
-    private lateinit var database: DatabaseReference
-    private lateinit var auth: FirebaseAuth
-
-
+    // UI
+    // ===========================================================================================
     @VisibleForTesting
     val progressDialog by lazy {
         ProgressDialog(this)
+    }
+
+    // Data
+    // ===========================================================================================
+    private lateinit var database:      DatabaseReference
+    private lateinit var auth:          FirebaseAuth
+
+    // Initializer
+    //
+    // ===========================================================================================
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_login_view)
+
+        database = FirebaseDatabase.getInstance().reference
+        auth = FirebaseAuth.getInstance()
     }
 
     public override fun onStart() {
@@ -50,14 +64,6 @@ class LoginActivity : AppCompatActivity() {
         hideProgressDialog()
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login_view)
-
-        database = FirebaseDatabase.getInstance().reference
-        auth = FirebaseAuth.getInstance()
-    }
-
     fun onClickLogin(v: View){
         signIn()
     }
@@ -65,18 +71,6 @@ class LoginActivity : AppCompatActivity() {
     fun onClickRegister(v: View){
         signUp()
     }
-
-//    fun login(view: View) {
-//        Log.d(TAG, "Clicking!")
-//
-//        val loginName = findViewById<EditText>(R.id.login_textView_name).text.toString()
-//        val loginPassowrd = findViewById<EditText>(R.id.login_textView_password).text.toString()
-//        val intent = Intent(this, HomeActivity::class.java).apply {
-//            putExtra(LOGIN_NAME, loginName)
-//            putExtra(LOGIN_PASSWORD, loginPassowrd)
-//        }
-//        startActivity(intent)
-//    }
 
     private fun signIn() {
         Log.d(TAG, "signIn")
@@ -89,7 +83,7 @@ class LoginActivity : AppCompatActivity() {
         val password = login_textView_password.text.toString()
 
         // TODO: Not nice to "download" all of the users
-        database.child(DB_USERS).orderByChild(DB_USERS_USERNAME).equalTo(username).addListenerForSingleValueEvent( object : ValueEventListener {
+        database.child(User.PATH).orderByChild(DB_USERS_USERNAME).equalTo(username).addListenerForSingleValueEvent( object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
                 Log.i(TAG, p0.toString())
             }
@@ -125,15 +119,13 @@ class LoginActivity : AppCompatActivity() {
 
     private fun signUp() {
         Log.d(TAG, "signUp")
-//        if (!validateForm()) {
-//            return
-//        }
 
         showProgressDialog()
 
-        val user = User(login_textView_name.text.toString(), login_textView_password.text.toString())
+        val user =
+            User(login_textView_name.text.toString(), login_textView_password.text.toString())
 
-        database.child(DB_USERS).child(UUID.randomUUID().toString()).setValue(user)
+        database.child(User.PATH).child(UUID.randomUUID().toString()).setValue(user)
             .addOnCompleteListener(this) { task ->
                 Log.i(TAG, "createUser:onComplete:" + task.isSuccessful)
                 hideProgressDialog()
@@ -146,33 +138,9 @@ class LoginActivity : AppCompatActivity() {
 
         }
 
-//
-//        auth.createUserWithEmailAndPassword(email, password)
-//            .addOnCompleteListener(this) { task ->
-//                Log.d(TAG, "createUser:onComplete:" + task.isSuccessful)
-////                hideProgressDialog()
-//
-//                if (task.isSuccessful) {
-//                    onAuthSuccess(task.result.user)
-//                } else {
-//                    Toast.makeText(baseContext, "Sign Up Failed",
-//                        Toast.LENGTH_SHORT).show()
-//                }
-//            }
     }
 
     private fun onAuthSuccess(user: User) {
-//        val username = usernameFromEmail(user.email!!)
-
-        // Write new user
-//        writeNewUser(user.uid, username, user.email)
-
-//        val intent = Intent(this, HomeActivity::class.java).apply {
-//                        putExtra(LOGIN_NAME, username)
-//        }
-//        startActivity(intent)
-
-        // Go to MainActivity
         startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
         finish()
     }
@@ -185,38 +153,21 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-//    private fun validateForm(): Boolean {
-//        var result = true
-//        if (TextUtils.isEmpty(fieldEmail.text.toString())) {
-//            fieldEmail.error = "Required"
-//            result = false
-//        } else {
-//            fieldEmail.error = null
-//        }
-//
-//        if (TextUtils.isEmpty(fieldPassword.text.toString())) {
-//            fieldPassword.error = "Required"
-//            result = false
-//        } else {
-//            fieldPassword.error = null
-//        }
-//
-//        return result
-//    }
-
-    // [START basic_write]
     private fun writeNewUser(userId: String, name: String, email: String?) {
         val user = User(name, email)
         database.child("users").child(userId).setValue(user)
     }
 
-    fun showProgressDialog() {
+    // UI
+    //
+    // ===========================================================================================
+    private fun showProgressDialog() {
         progressDialog.setMessage(getString(R.string.loading))
         progressDialog.isIndeterminate = true
         progressDialog.show()
     }
 
-    fun hideProgressDialog() {
+    private fun hideProgressDialog() {
         if (progressDialog.isShowing) {
             progressDialog.dismiss()
         }

@@ -17,11 +17,14 @@
             </intent-filter>
         </activity>
         <activity android:name=".HomeActivity">
-                  <!--android:parentActivityName=".LoginActivity">-->
-            <!--&lt;!&ndash; For Lower Android SDK API &ndash;&gt;-->
-            <!--<meta-data-->
-                <!--android:name="android.support.PARENT_ACTIVITY"-->
-                <!--android:value=".LoginActivity" />-->
+
+            <!-- android:parentActivityName=".LoginActivity"> -->
+            <!-- &lt;!&ndash; For Lower Android SDK API &ndash;&gt; -->
+            <!-- <meta-data -->
+            <!-- android:name="android.support.PARENT_ACTIVITY" -->
+            <!-- android:value=".LoginActivity" /> -->
+        </activity>
+        <activity android:name=".CreateGroupActivity">
         </activity>
     </application>
 
