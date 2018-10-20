@@ -1,19 +1,15 @@
 package com.walk2gather
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.widget.ListView
-import com.walk2gather.model.GroupItem
-import com.walk2gather.adapter.CustomAdapter
-import android.support.v4.view.accessibility.AccessibilityEventCompat.setAction
-import android.view.View
 import android.widget.AdapterView
-
-
+import android.widget.ListView
+import com.walk2gather.adapter.CustomAdapter
+import com.walk2gather.model.GroupItem
 
 
 class HomeActivity : AppCompatActivity() {
@@ -26,6 +22,8 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var listView : ListView
 
     private lateinit var adapter: CustomAdapter
+
+
 
     // Initializer
     //
