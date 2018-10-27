@@ -5,10 +5,9 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
-import com.google.android.gms.tasks.Tasks.call
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import com.walk2gather.model.db.Group
+import com.walk2gather.model.db.*
 import kotlinx.android.synthetic.main.activity_create_group.*
 import java.util.*
 
@@ -21,7 +20,7 @@ class CreateGroupActivity : AppCompatActivity() {
 
     // Data
     // ===========================================================================================
-    private lateinit var database: DatabaseReference
+    private lateinit var database:      DatabaseReference
     private lateinit var auth:          FirebaseAuth
 
     // Initializer
@@ -38,7 +37,7 @@ class CreateGroupActivity : AppCompatActivity() {
     // UI
     // ===========================================================================================
     fun onClickCreateGroup(v: View?){
-        invokeCreateGroup(textView_nameGroup.text.toString())
+        ifGroupExists(textView_nameGroup.text.toString())
     }
 
     fun onClickBack(v: View?){
@@ -53,7 +52,7 @@ class CreateGroupActivity : AppCompatActivity() {
     // Contributors
     // ===========================================================================================
 
-    private fun ifGroupExists(nameGroup: String, call: (nameGroup: String) -> Unit){
+    private fun ifGroupExists(nameGroup: String) {
         database.child(Group.PATH).orderByChild(DB_GROUP_NAME).equalTo(nameGroup).
             addListenerForSingleValueEvent( object : ValueEventListener {
                 override fun onCancelled(p0: DatabaseError) {
@@ -76,28 +75,54 @@ class CreateGroupActivity : AppCompatActivity() {
 
                     // check if missing
                     if (missing) {
-                        createGroup(nameGroup)
+                        createGroup(nameGroup, "test")
                     }
                 }
         })
     }
 
-    private fun createGroup(nameGroup : String){
-        val grp = Group(nameGroup, "test", 0, null )
-        database.child(Group.PATH).child(UUID.randomUUID().toString()).setValue(grp)
+    private fun createGroup(nameGroup : String, uidUser : String){
+
+        val grpMember = GroupMember(uidUser, true)
+
+        val point = Point(UUID.randomUUID().toString(), arrayListOf(1.0f, 2.0f, 3.0f))
+
+        val grp = Group(UUID.randomUUID().toString(), nameGroup, 0, mapOf(point.uid to true), mapOf(grpMember.uidUser to grpMember))
+
+        // Save new group
+        database.child(Group.PATH).child(grp.uid).setValue(grp)
             .addOnCompleteListener(this) { task ->
                 Log.i(TAG, "invokeCreateGroup:onComplete: " + task.isSuccessful)
 
                 if (task.isSuccessful) {
-                    backToHome()
+//                    backToHome()
                 } else {
                     // TODO some errors
                 }
             }
-    }
 
-    private fun invokeCreateGroup(nameGroup: String) {
-        // check if
-        ifGroupExists(nameGroup, ::invokeCreateGroup)
+        // Save points
+        database.child(Point.PATH).child(point.uid).setValue(point)
+            .addOnCompleteListener(this) { task ->
+                Log.i(TAG, "invokeCreateGroupMember:onComplete: " + task.isSuccessful)
+
+                if (task.isSuccessful) {
+//                    backToHome()
+                } else {
+                    // TODO some errors
+                }
+            }
+
+        // Update user to become moderator
+//        database.child(User.PATH).child(uidUser).updateChildren(mapOf("/group"))
+//            .addOnCompleteListener(this) { task ->
+//                Log.i(TAG, "invokeCreateGroupMember:onComplete: " + task.isSuccessful)
+//
+//                if (task.isSuccessful) {
+////                    backToHome()
+//                } else {
+//                    // TODO some errors
+//                }
+//            }
     }
 }

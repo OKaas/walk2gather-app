@@ -82,7 +82,7 @@ class LoginActivity : AppCompatActivity() {
         val username = login_textView_name.text.toString()
         val password = login_textView_password.text.toString()
 
-        // TODO: Not nice to "download" all of the users
+        // TODO: Be sure have some indexes
         database.child(User.PATH).orderByChild(DB_USERS_USERNAME).equalTo(username).addListenerForSingleValueEvent( object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
                 Log.i(TAG, p0.toString())
@@ -100,21 +100,7 @@ class LoginActivity : AppCompatActivity() {
                     }
                 }
             }
-
         })
-
-//        auth.signInWithEmailAndPassword(email, password)
-//            .addOnCompleteListener(this) { task ->
-//                Log.d(TAG, "signIn:onComplete:" + task.isSuccessful)
-////                hideProgressDialog()
-//
-//                if (task.isSuccessful) {
-//                    onAuthSuccess(task.result.user)
-//                } else {
-//                    Toast.makeText(baseContext, "Sign In Failed",
-//                        Toast.LENGTH_SHORT).show()
-//                }
-//            }
     }
 
     private fun signUp() {
@@ -122,10 +108,9 @@ class LoginActivity : AppCompatActivity() {
 
         showProgressDialog()
 
-        val user =
-            User(login_textView_name.text.toString(), login_textView_password.text.toString())
+        val user = User(UUID.randomUUID().toString(), login_textView_name.text.toString(), login_textView_password.text.toString())
 
-        database.child(User.PATH).child(UUID.randomUUID().toString()).setValue(user)
+        database.child(User.PATH).child(user.uid).setValue(user)
             .addOnCompleteListener(this) { task ->
                 Log.i(TAG, "createUser:onComplete:" + task.isSuccessful)
                 hideProgressDialog()
@@ -135,9 +120,7 @@ class LoginActivity : AppCompatActivity() {
                     Toast.makeText(baseContext, "Sign Up Failed",
                         Toast.LENGTH_SHORT).show()
                 }
-
         }
-
     }
 
     private fun onAuthSuccess(user: User) {
@@ -153,7 +136,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun writeNewUser(userId: String, name: String, email: String?) {
+    private fun writeNewUser(userId: String, name: String, email: String) {
         val user = User(name, email)
         database.child("users").child(userId).setValue(user)
     }
