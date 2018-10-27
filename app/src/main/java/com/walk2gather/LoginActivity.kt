@@ -1,19 +1,19 @@
 package com.walk2gather
 
+import android.app.ProgressDialog
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.annotation.VisibleForTesting
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import com.walk2gather.model.db.User
 import kotlinx.android.synthetic.main.activity_login_view.*
-import android.app.ProgressDialog
-import android.support.annotation.VisibleForTesting
-import android.widget.Toast
-import com.google.firebase.database.*
-import com.walk2gather.model.db.Group
-import java.util.*
+
+
 
 class LoginActivity : AppCompatActivity() {
 
@@ -94,7 +94,7 @@ class LoginActivity : AppCompatActivity() {
                 users.forEach {
                     val user= it.getValue(User::class.java) as User
                     if(user.password.equals(password)){
-                        onAuthSuccess(user)
+                        onAuthSuccess(it.key!!)
                     } else {
                         Log.i(TAG, "Cannot login" +user.toString())
                     }
@@ -106,24 +106,48 @@ class LoginActivity : AppCompatActivity() {
     private fun signUp() {
         Log.d(TAG, "signUp")
 
+        val username = login_textView_name.text.toString()
+        val password = login_textView_password.text.toString()
+
         showProgressDialog()
 
-        val user = User(UUID.randomUUID().toString(), login_textView_name.text.toString(), login_textView_password.text.toString())
+        database.child(User.PATH).orderByChild(DB_USERS_USERNAME).equalTo(username).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+                Log.i(TAG, "Not exists ...")
 
-        database.child(User.PATH).child(user.uid).setValue(user)
-            .addOnCompleteListener(this) { task ->
-                Log.i(TAG, "createUser:onComplete:" + task.isSuccessful)
-                hideProgressDialog()
-                if (task.isSuccessful) {
-                    onAuthSuccess(user)
-                } else {
-                    Toast.makeText(baseContext, "Sign Up Failed",
-                        Toast.LENGTH_SHORT).show()
+
+            }
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                Log.i(TAG, "Exists ...")
+
+                if (snapshot.value == null) {
+                    createUser(username, password)
                 }
+            }
+        })
+    }
+
+    private fun createUser(userName: String, password: String){
+        val ref = database.child(User.PATH).push()
+        val user = User(ref.key!!, userName, password)
+
+        ref.setValue(user).addOnCompleteListener(this) { task ->
+            Log.i(TAG, "createUser:onComplete:" + task.isSuccessful)
+            hideProgressDialog()
+            if (task.isSuccessful) {
+                onAuthSuccess(ref.key!!)
+            } else {
+                Toast.makeText(
+                    baseContext, "Sign Up Failed",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
-    private fun onAuthSuccess(user: User) {
+    private fun onAuthSuccess(uidUser: String) {
+        UID_USER = uidUser
         startActivity(Intent(this@LoginActivity, HomeActivity::class.java))
         finish()
     }

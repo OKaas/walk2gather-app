@@ -9,7 +9,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.walk2gather.model.db.*
 import kotlinx.android.synthetic.main.activity_create_group.*
-import java.util.*
 
 class CreateGroupActivity : AppCompatActivity() {
 
@@ -75,54 +74,38 @@ class CreateGroupActivity : AppCompatActivity() {
 
                     // check if missing
                     if (missing) {
-                        createGroup(nameGroup, "test")
+                        createGroup(nameGroup, UID_USER)
                     }
                 }
         })
     }
 
-    private fun createGroup(nameGroup : String, uidUser : String){
+    private fun createGroup(nameGroup : String, uidUser : String) {
 
-        val grpMember = GroupMember(uidUser, true)
+        val refGroup = database.child(Group.PATH).push()
+        val refPoint = database.child(Point.PATH).push()
+        val refUserGroup = database.child(User.PATH).child(uidUser).child(UserGroup.PATH).child(refGroup.key!!)
 
-        val point = Point(UUID.randomUUID().toString(), arrayListOf(1.0f, 2.0f, 3.0f))
-
-        val grp = Group(UUID.randomUUID().toString(), nameGroup, 0, mapOf(point.uid to true), mapOf(grpMember.uidUser to grpMember))
+        val grpMember = GroupMember(true)
+        val point = Point(refPoint.key!!, mapOf())
+        val grp = Group(refGroup.key!!, nameGroup, 0, mapOf(refPoint.key!! to true), mapOf(uidUser to grpMember))
+        val userGroup = UserGroup(true)
 
         // Save new group
-        database.child(Group.PATH).child(grp.uid).setValue(grp)
-            .addOnCompleteListener(this) { task ->
-                Log.i(TAG, "invokeCreateGroup:onComplete: " + task.isSuccessful)
-
-                if (task.isSuccessful) {
-//                    backToHome()
-                } else {
-                    // TODO some errors
-                }
-            }
+        refGroup.setValue(grp)
 
         // Save points
-        database.child(Point.PATH).child(point.uid).setValue(point)
-            .addOnCompleteListener(this) { task ->
-                Log.i(TAG, "invokeCreateGroupMember:onComplete: " + task.isSuccessful)
+        refPoint.setValue(point)
 
-                if (task.isSuccessful) {
-//                    backToHome()
-                } else {
-                    // TODO some errors
-                }
+        // Push new group to user
+        refUserGroup.setValue(userGroup).addOnCompleteListener(this) { task ->
+            Log.i(TAG, "invokeCreateGroupMember:onComplete: " + task.isSuccessful)
+
+            if (task.isSuccessful) {
+                backToHome()
+            } else {
+                // TODO some errors
             }
-
-        // Update user to become moderator
-//        database.child(User.PATH).child(uidUser).updateChildren(mapOf("/group"))
-//            .addOnCompleteListener(this) { task ->
-//                Log.i(TAG, "invokeCreateGroupMember:onComplete: " + task.isSuccessful)
-//
-//                if (task.isSuccessful) {
-////                    backToHome()
-//                } else {
-//                    // TODO some errors
-//                }
-//            }
+        }
     }
 }

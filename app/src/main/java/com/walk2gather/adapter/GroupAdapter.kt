@@ -8,7 +8,6 @@ import android.view.animation.AnimationUtils
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import com.google.firebase.database.FirebaseDatabase
 import com.walk2gather.R
 import com.walk2gather.R.id.*
 import com.walk2gather.R.layout.group_item_view
@@ -27,6 +26,7 @@ class CustomAdapter(private val dataSet: ArrayList<GroupItem>, private var mCont
         internal var txtName: TextView? = null
         internal var txtOccupancy: TextView? = null
         internal var info : ImageView? = null
+        internal var uidPoint: String = ""
     }
 
     override fun onClick(v: View) {
@@ -69,6 +69,7 @@ class CustomAdapter(private val dataSet: ArrayList<GroupItem>, private var mCont
 
         viewHolder.txtName!!.text = dataModel!!.name
         viewHolder.txtOccupancy!!.text = dataModel!!.occupancy.toString()
+        viewHolder.uidPoint = dataModel.uidPoint
 //        viewHolder.txtType!!.setText(dataModel!!.getType())
 //        viewHolder.txtVersion!!.setText(dataModel!!.getVersion_number())
         viewHolder.info!!.setOnClickListener(this)

@@ -18,12 +18,15 @@ import com.walk2gather.model.db.Group
 import com.walk2gather.model.ui.GroupItem
 import kotlinx.android.synthetic.main.activity_home_view.*
 
+// TODO VERY VERY BAD PRACTISE!!!
+var UID_USER = ""
+var UID_POINT = ""
 
 class HomeActivity : AppCompatActivity() {
 
     // Const
     // ===========================================================================================
-    private val TAG = this::class.java.simpleName
+    private val TAG                     = this::class.java.simpleName
 
     // Data
     // ===========================================================================================
@@ -31,6 +34,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var auth:          FirebaseAuth
 
     private lateinit var modelGroup:    ArrayList<GroupItem>
+    private lateinit var uidUser:       String
 
     // GUI
     // ===========================================================================================
@@ -57,6 +61,11 @@ class HomeActivity : AppCompatActivity() {
             val dataModel = modelGroup.get(position)
 
             Log.i(TAG, dataModel.toString())
+
+            // save current point UID
+            UID_POINT = dataModel.uidPoint
+
+            startActivity(Intent(this@HomeActivity, MapActivity::class.java))
         }
 
         // Prepare database connection
@@ -80,7 +89,7 @@ class HomeActivity : AppCompatActivity() {
                 // fill Item holder
                 groups.forEach {
                     val group = it.getValue(Group::class.java) as Group
-                    modelGroup.add( GroupItem(group.name, group.ocucpancy) )
+                    modelGroup.add( GroupItem(group.name, group.ocucpancy, group.points!!.keys.first()) )
                 }
 
                 fillGroupList()
@@ -132,6 +141,10 @@ class HomeActivity : AppCompatActivity() {
 
 
     private fun intentCreateGroup(){
+//        val intent = Intent(this, CreateGroupActivity::class.java).apply {
+//            putExtra(USER_UID, uidUser)
+//        }
+//        startActivity(intent)
         startActivity(Intent(this@HomeActivity, CreateGroupActivity::class.java))
     }
 
