@@ -8,11 +8,9 @@ import android.view.View
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.walk2gather.model.db.Point
+import com.walk2gather.model.dto.PointDTO
 import kotlinx.android.synthetic.main.activity_map.*
 import java.text.SimpleDateFormat
-import java.time.Instant
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 class MapActivity : AppCompatActivity() {
@@ -37,7 +35,7 @@ class MapActivity : AppCompatActivity() {
         database = FirebaseDatabase.getInstance().reference
         auth = FirebaseAuth.getInstance()
 
-        point = database.child(com.walk2gather.model.db.Point.PATH).child(UID_POINT).child("points")
+        point = database.child(com.walk2gather.model.db.Point.PATH).child(UID_POINT).child(Point.PATH_COORDINATES)
 
         point.addValueEventListener( object : ValueEventListener {
             override fun onCancelled(snapshot: DatabaseError) {
@@ -50,9 +48,9 @@ class MapActivity : AppCompatActivity() {
                 points.forEach {
                     Log.i(TAG, "TS: ${it.key} > value: ${it.value}")
 
-                    val tmp = (it.value as String).split("|")
+                    val pt = PointDTO.initInstance(it)
 
-                    canvas_view.addPoint(tmp[0].toFloat(), tmp[1].toFloat())
+                    canvas_view.addPoint(pt.x, pt.y)
                 }
                 canvas_view.invalidate()
             }
@@ -80,6 +78,6 @@ class MapActivity : AppCompatActivity() {
     }
 
     private fun savePoint(timestamp: String, x: Float, y: Float){
-        point.child(timestamp).setValue("$x | $y")
+        point.child(timestamp).setValue(Point.formatCoordinates(x, y))
     }
 }
