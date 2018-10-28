@@ -4,8 +4,7 @@ data class Point (
 
     var uid: String,
 
-    var points: Map<Float, Float>? = null
-
+    var points: Map<String, String>
 ){
 
     companion object Path {

@@ -64,7 +64,7 @@ class CreateGroupActivity : AppCompatActivity() {
                     var missing = true
 
                     for (user in users){
-                        val group= user.getValue(Group::class.java) as Group
+                        val group= user.value as Group
 
                         if(group.name == nameGroup){
                             missing = false

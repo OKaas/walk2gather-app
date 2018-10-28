@@ -9,12 +9,18 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.walk2gather.model.db.Point
 import kotlinx.android.synthetic.main.activity_map.*
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 class MapActivity : AppCompatActivity() {
 
     // Const
     // ===========================================================================================
     private val TAG                         = this::class.java.simpleName
+    private val FORMAT_TIMESTAMP            = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
     // Data
     // ===========================================================================================
@@ -26,27 +32,29 @@ class MapActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
 
+
+
         database = FirebaseDatabase.getInstance().reference
         auth = FirebaseAuth.getInstance()
 
-        database.child(Point.PATH).child(UID_POINT).child("points").addValueEventListener( object : ValueEventListener {
-            override fun onCancelled(snapshot: DatabaseError) {
+        point = database.child(com.walk2gather.model.db.Point.PATH).child(UID_POINT).child("points")
 
+        point.addValueEventListener( object : ValueEventListener {
+            override fun onCancelled(snapshot: DatabaseError) {
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
                 val points = snapshot.children
                 Log.i(TAG, "Points changed!")
 
-
                 points.forEach {
-                    val point = it.getValue(Map::class.java) as Map<Float, Float>
+                    Log.i(TAG, "TS: ${it.key} > value: ${it.value}")
 
-                    canvas_view.mx = point.keys.first()
-                    canvas_view.my = point.values.first()
+                    val tmp = (it.value as String).split("|")
 
-                    canvas_view.invalidate()
+                    canvas_view.addPoint(tmp[0].toFloat(), tmp[1].toFloat())
                 }
+                canvas_view.invalidate()
             }
         })
 
@@ -57,21 +65,21 @@ class MapActivity : AppCompatActivity() {
 
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    canvas_view.mx = x
-                    canvas_view.my = y
-                    canvas_view.invalidate()
+                    savePoint(FORMAT_TIMESTAMP.format(Date()), x, y)
                 }
                 MotionEvent.ACTION_MOVE -> {
-//                moveTouch(x, y)
                     canvas_view.invalidate()
                 }
                 MotionEvent.ACTION_UP -> {
-//                upTouch()
                     canvas_view.invalidate()
                 }
             }
             true
         }
 
+    }
+
+    private fun savePoint(timestamp: String, x: Float, y: Float){
+        point.child(timestamp).setValue("$x | $y")
     }
 }

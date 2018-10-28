@@ -33,8 +33,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var database:      DatabaseReference
     private lateinit var auth:          FirebaseAuth
 
-    private lateinit var modelGroup:    ArrayList<GroupItem>
-    private lateinit var uidUser:       String
+    private var modelGroup:             ArrayList<GroupItem>        = arrayListOf()
 
     // GUI
     // ===========================================================================================
@@ -54,11 +53,11 @@ class HomeActivity : AppCompatActivity() {
         val loginName = intent.getStringExtra(LoginActivity.LOGIN_NAME)
         val loginPassword = intent.getStringExtra(LoginActivity.LOGIN_PASSWORD)
 
-        modelGroup = arrayListOf()
+        modelGroup.clear()
         adapter = CustomAdapter(modelGroup, applicationContext)
 
         homeView_listView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
-            val dataModel = modelGroup.get(position)
+            val dataModel = modelGroup[position]
 
             Log.i(TAG, dataModel.toString())
 
@@ -78,6 +77,7 @@ class HomeActivity : AppCompatActivity() {
         super.onStart()
         Log.i(TAG, "onStart")
 
+        modelGroup.clear()
 
         database.child(Group.PATH).addListenerForSingleValueEvent( object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {

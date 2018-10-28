@@ -15,9 +15,7 @@ class CanvasView(internal var context: Context, attrs: AttributeSet) : View(cont
 
     var canvas: Canvas = Canvas()
     var paint: Paint = Paint()
-    var point: Point = Point()
-    var mx: Float = 0f
-    var my: Float = 0f
+    var points: ArrayList<Pair<Float, Float>> = arrayListOf()
 
     init {
         paint.color = Color.BLACK
@@ -35,10 +33,13 @@ class CanvasView(internal var context: Context, attrs: AttributeSet) : View(cont
         super.onDraw(canvas)
         // draw the mPath with the mPaint on the canvas when onDraw
 
-        canvas.drawCircle(mx, my, RADIUS, paint)
+        points.forEach{
+            canvas.drawCircle(it.first, it.second, RADIUS, paint)
+        }
+
     }
 
-//    fun redraw(){
-//        invalidate()
-//    }
+    fun addPoint(x: Float, y: Float){
+        points.add(Pair(x, y))
+    }
 }
