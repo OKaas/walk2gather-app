@@ -50,34 +50,34 @@ class MapActivity : AppCompatActivity() {
 
                     val pt = PointDTO.initInstance(it)
 
-                    canvas_view.addPoint(pt.x, pt.y)
+                    canvas_view.addPoint(pt.position.latitude, pt.position.longitude)
                 }
                 canvas_view.invalidate()
             }
         })
 
-        canvas_view.setOnTouchListener { v: View, event: MotionEvent ->
-
-            val x = event.x
-            val y = event.y
-
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    savePoint(FORMAT_TIMESTAMP.format(Date()), x, y)
-                }
-                MotionEvent.ACTION_MOVE -> {
-                    canvas_view.invalidate()
-                }
-                MotionEvent.ACTION_UP -> {
-                    canvas_view.invalidate()
-                }
-            }
-            true
-        }
+//        canvas_view.setOnTouchListener { v: View, event: MotionEvent ->
+//
+//            val x = event.x
+//            val y = event.y
+//
+//            when (event.action) {
+//                MotionEvent.ACTION_DOWN -> {
+//                    savePoint(FORMAT_TIMESTAMP.format(Date()), x, y)
+//                }
+//                MotionEvent.ACTION_MOVE -> {
+//                    canvas_view.invalidate()
+//                }
+//                MotionEvent.ACTION_UP -> {
+//                    canvas_view.invalidate()
+//                }
+//            }
+//            true
+//        }
 
     }
 
-    private fun savePoint(timestamp: String, x: Float, y: Float){
+    private fun savePoint(timestamp: String, x: Double, y: Double){
         point.child(timestamp).setValue(Point.formatCoordinates(x, y))
     }
 }

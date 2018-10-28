@@ -1,5 +1,7 @@
 package com.walk2gather.model.db
 
+import java.text.SimpleDateFormat
+
 data class Point (
 
     var uid: String,
@@ -11,8 +13,9 @@ data class Point (
         val PATH = Point::class.java.simpleName.toLowerCase()
         const val PATH_COORDINATES = "points"
         const val DELIMITER_COORDINATES = "|"
+        val FORMAT_TIMESTAMP = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
-        fun formatCoordinates(x: Float, y: Float): String {
+        fun formatCoordinates(x: Double, y: Double): String {
             return "$x $DELIMITER_COORDINATES $y"
         }
     }

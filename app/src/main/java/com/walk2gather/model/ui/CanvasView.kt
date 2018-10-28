@@ -1,12 +1,12 @@
 package com.walk2gather.model.ui
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
-import android.graphics.Bitmap
-import android.view.MotionEvent
-import com.walk2gather.MapActivity
 
 
 class CanvasView(internal var context: Context, attrs: AttributeSet) : View(context, attrs) {
@@ -15,7 +15,7 @@ class CanvasView(internal var context: Context, attrs: AttributeSet) : View(cont
 
     var canvas: Canvas = Canvas()
     var paint: Paint = Paint()
-    var points: ArrayList<Pair<Float, Float>> = arrayListOf()
+    var points: ArrayList<Pair<Double, Double>> = arrayListOf()
 
     init {
         paint.color = Color.BLACK
@@ -34,12 +34,12 @@ class CanvasView(internal var context: Context, attrs: AttributeSet) : View(cont
         // draw the mPath with the mPaint on the canvas when onDraw
 
         points.forEach{
-            canvas.drawCircle(it.first, it.second, RADIUS, paint)
+            canvas.drawCircle(it.first.toFloat(), it.second.toFloat(), RADIUS, paint)
         }
 
     }
 
-    fun addPoint(x: Float, y: Float){
+    fun addPoint(x: Double, y: Double){
         points.add(Pair(x, y))
     }
 }

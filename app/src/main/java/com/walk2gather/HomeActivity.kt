@@ -49,10 +49,6 @@ class HomeActivity : AppCompatActivity() {
 
         Log.i(TAG, "onCreate")
 
-        // First -> from login Activity
-        val loginName = intent.getStringExtra(LoginActivity.LOGIN_NAME)
-        val loginPassword = intent.getStringExtra(LoginActivity.LOGIN_PASSWORD)
-
         modelGroup.clear()
         adapter = CustomAdapter(modelGroup, applicationContext)
 
@@ -64,11 +60,10 @@ class HomeActivity : AppCompatActivity() {
             // save current point UID
             UID_POINT = dataModel.uidPoint
 
-            startActivity(Intent(this@HomeActivity, MapActivity::class.java))
+            startActivity(Intent(this@HomeActivity, MapsActivity::class.java))
         }
 
         // Prepare database connection
-        Log.i(TAG, "$loginName > $loginPassword" )
         database = FirebaseDatabase.getInstance().reference
         auth = FirebaseAuth.getInstance()
     }
@@ -113,6 +108,7 @@ class HomeActivity : AppCompatActivity() {
         return when (item.itemId) {
             main_menu_action_to_join -> {
                 Log.i(TAG, "Clicked Add")
+                startActivity(Intent(this@HomeActivity, MapsActivity::class.java))
                 item.isChecked = false
                 true
             }
